@@ -4,21 +4,24 @@ $.ajaxPrefilter(function (settings, _, jqXHR) {
   jqXHR.setRequestHeader('Authorization', API_KEY);
 });
 
-var searchYouTube = (query, callback) => {
+var searchYouTube = (options, callback) => {
   $.ajax({
     url: 'https://app-hrsei-api.herokuapp.com/api/recastly/videos',
     type: 'GET',
     data: {
-      key: YOUTUBE_API_KEY,
-      maxResults: 5,
-      q: query,
+      key: options.key,
+      maxResults: options.max || 5,
+      q: options.query,
       type: 'video',
       part: 'snippet',
-      videoEmbeddable: true
+      videoEmbeddable: 'true'
     },
     contentType: 'application/json',
     success: (data) => {
       callback(data);
+    },
+    error: (data) => {
+      console.error(data);
     }
   });
 };

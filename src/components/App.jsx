@@ -2,39 +2,60 @@ import searchYouTube from '../lib/searchYouTube.js';
 import VideoList from './VideoList.js';
 import VideoPlayer from './VideoPlayer.js';
 import Search from './Search.js';
+import exampleVideoData from '../data/exampleVideoData.js';
+import { API_KEY, YOUTUBE_API_KEY } from '../config/config.js';
 
+// console.log(exampleVideoData)
 class App extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      videoList: [],
-      currentVideo: {
-        snippet: {title: '', description: ''},
-        id: {videoId: ''}
-      }
+      // videoList: [],
+      videos: exampleVideoData,
+      currentVideo: exampleVideoData[0]
     };
   }
 
-  setCurrentVideo(video) {
+  componentDidMount(video) {
+    this.getYouTubeVideos('cute kittens');
+  }
+
+  getYouTubeVideos(query) {
+    var options = {
+      key: this.props.API_KEY,
+      query: query
+    };
+    // console.log(this)
+    this.props.searchYouTube(options, (videos) => {
+      this.setState({
+        videos: videos,
+        currentVideo: videos[0]
+      });
+    });
+  }
+
+  handleVideoListEntryTitleClick(video) {
     this.setState({
       currentVideo: video,
 
     });
   }
 
-  componentDidMount() {
-    searchYouTube('', (vid) => {
-      currentVideo: vid;
-    });
-  }
+  // searchYouTube(options, (videos) => {
+  //   this.setState({
+  //     videos: videos,
+  //     currentVideo: videos[0]
+  //   });
+  // });
+
 
   render() {
     return (
       <div>
         <nav className="navbar">
           <div className="col-md-6 offset-md-3">
-            <Search />
+            <Search handleSearchInputChange={this.getYouTubeVideos.bind(this)}/>
           </div>
         </nav>
         <div className="row">
@@ -42,8 +63,8 @@ class App extends React.Component {
             <VideoPlayer video={this.state.currentVideo} />
           </div>
           <div className="col-md-5">
-            <VideoList videos={this.state.videoList}
-              setCurrentVideo={this.setCurrentVideo.bind(this)} />
+            <VideoList videos={this.state.videos}
+              handleVideoListEntryTitleClick={this.handleVideoListEntryTitleClick.bind(this)} />
           </div>
         </div>
       </div>
